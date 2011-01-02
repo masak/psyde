@@ -1,0 +1,13 @@
+ <entry>
+    <title>$title</title>
+    <link href="$root/$url"/>
+    <id>$id</id>
+    <author>
+      <name>$author</name>
+    </author>
+    <updated>$created</updated>
+    <content type="html">
+      $body
+    </content>
+  </entry>
+

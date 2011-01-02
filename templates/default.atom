@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title>Strangely Consistent</title>
+  <link href="http://strangelyconsistent.org/blog" />
+  <link rel="self" href="http://strangelyconsistent.org/blog/feed.atom" />
+  <updated>$updated</updated>
+  <id>http://strangelyconsistent.org/</id>
+
+$body
+
+</feed>

@@ -1,0 +1,248 @@
+#! /usr/bin/env perl6
+use v6;
+
+my $article_template = slurp("templates/post.html");
+my $default_template = slurp("templates/default.html");
+my $root_url = "http://strangelyconsistent.org/blog";
+
+my @monthnames = <Jan Feb Mar Apr
+                  May Jun Jul Aug
+                  Sep Oct Nov Dec>;
+my %all_posts;
+my $POSTS_IN_INDEX = 3;
+
+sub subst_all(Str $string is copy, *@substitutions) {
+    for @substitutions {
+        $string .= subst(.key, .value, :g)
+    }
+    $string;
+}
+
+sub html_escape {
+    # RAKUDO: Need this unnecessary prefix:<~> to make it work
+    return (~$^original).trans:
+           ['&',     '<',    '>'   ]
+        => ['&amp;', '&lt;', '&gt;']
+    ;
+}
+
+sub apply_some_styles {
+    # RAKUDO: Need this unnecessary prefix:<~> to make it work
+    return (~$^original).trans:
+           ['class="quote"',
+            "class='quote'",
+            'class="separator"',
+            "class='separator'"]
+        => ['style="background: #ded; margin: 1em; padding: 1em;"',
+            'style="background: #ded; margin: 1em; padding: 1em;"',
+            'style="text-align: center"',
+            'style="text-align: center"']
+    ;
+}
+
+sub nonexistent-or-older($target, :than(@sources)!) {
+    return $target.IO !~~ :e
+           || $target.IO.changed before any(@sources).IO.changed;
+}
+
+say "[_site/list-of-posts.html]";
+for dir('posts', :test( / '.markdown' $ / )) -> $markdown_filename {
+    given open "posts/$markdown_filename" -> $infile {
+
+        $infile.get;
+
+        my %info;
+        until (my $line = $infile.get) eq '---' {
+            my ($key, $value) = $line.split(': ', 2);
+            %info{$key} = $value;
+        }
+        %info<created> ~~ /(\d\d\d\d) '-' (\d\d) '-' (\d\d)/;
+        %info<humandate> = "$2.Int() @monthnames[$1-1], $0";
+        %info<url> = "$markdown_filename.subst(/'.' <-[.]>+ $/, '')";
+        %all_posts{%info<created>} = {
+            filename =>"posts/$markdown_filename",
+            %info,
+        };
+
+        my $html_filename = $markdown_filename.subst(/'.' <-[.]>+ $/, '.html');
+        unless nonexistent-or-older "_site/$html_filename",
+                                    :than["posts/$markdown_filename"] {
+            $infile.close();
+            next;
+        }
+        say "[posts/$markdown_filename -> _site/$html_filename]";
+
+        my $temp_filename = "/tmp/justmarkdown";
+        given open $temp_filename, :w -> $tempfile {
+            $tempfile.print($infile.slurp);
+            $tempfile.close();
+        }
+
+        $infile.close();
+
+        my $converted_content
+            = qx[Markdown_1.0.1/Markdown.pl --html4tags /tmp/justmarkdown];
+        unlink $temp_filename;
+
+        my $article = $article_template.&subst_all(
+            '$root'      => $root_url,
+            '$url'       => %info<url>,
+            '$title'     => %info<title>,
+            '$author'    => %info<author>,
+            '$created'   => %info<created>,
+            '$humandate' => %info<humandate>,
+            '$body'      => $converted_content,
+        );
+
+        my $page = $default_template.&subst_all(
+            '$title' => %info<title>,
+            '$root'  => $root_url,
+            '$body'  => $article,
+        );
+
+        given open "_site/$html_filename", :w -> $outfile {
+            $outfile.print($page);
+            $outfile.close();
+        }
+    }
+}
+
+my $postitem_template = slurp("templates/postitem.html");
+my $postlist_template = slurp("templates/postlist.html");
+my $post_list = '';
+
+for %all_posts{reverse sort { %all_posts{$_}<created> }, keys %all_posts} {
+    $post_list ~= $postitem_template.&subst_all(
+        '$root'      => $root_url,
+        '$url'       => .<url>,
+        '$title'     => .<title>,
+        '$author'    => .<author>,
+        '$humandate' => .<humandate>,
+    );
+}
+
+my $post_list_page = $postlist_template.&subst_all(
+    '$title' => "All posts",
+    '$root'  => $root_url,
+    '$body'  => $post_list,
+);
+given open "_site/list-of-posts.html", :w -> $outfile {
+    $outfile.print($post_list_page);
+    $outfile.close();
+}
+
+my @all_posts_newest_first = reverse sort { %all_posts{$_}<created> },
+                                          keys %all_posts;
+
+my @index_filenames = map { .<filename> },
+                      %all_posts{@all_posts_newest_first[^(3 min +%all_posts)]};
+if nonexistent-or-older "_site/index.html",
+                        :than(@index_filenames) {
+
+    say "[@index_filenames.join("\n ") -> _site/index.html]";
+    my $index_posts_content = '';
+
+    for %all_posts{@all_posts_newest_first[^(3 min +%all_posts)]} -> %info {
+
+        my $markdown_filename = %info<url> ~ ".markdown";
+        given open "posts/$markdown_filename" -> $infile {
+
+            $infile.get;
+            1 until $infile.get eq '---';
+
+            my $temp_filename = "/tmp/justmarkdown";
+            given open $temp_filename, :w -> $tempfile {
+                $tempfile.print($infile.slurp);
+                $tempfile.close();
+            }
+
+            $infile.close();
+
+            my $converted_content
+                = qx[Markdown_1.0.1/Markdown.pl /tmp/justmarkdown];
+            unlink $temp_filename;
+
+            my $article = $article_template.&subst_all(
+                '$root'      => $root_url,
+                '$url'       => %info<url>,
+                '$title'     => %info<title>,
+                '$author'    => %info<author>,
+                '$created'   => %info<created>,
+                '$humandate' => %info<humandate>,
+                '$body'      => $converted_content,
+            );
+            $index_posts_content ~= $article;
+        }
+    }
+
+    my $index_page = $default_template.&subst_all(
+        '$title' => "Main page",
+        '$root'  => $root_url,
+        '$body'  => $index_posts_content,
+    );
+    given open "_site/index.html", :w -> $outfile {
+        $outfile.print($index_page);
+        $outfile.close();
+    }
+}
+
+my @feed_filenames = map { .<filename> },
+                     %all_posts{@all_posts_newest_first[^(10 min +%all_posts)]};
+if nonexistent-or-older "_site/feed.atom",
+                        :than(@feed_filenames) {
+
+    say "[@feed_filenames.join("\n ") -> _site/feed.atom]";
+
+    my $atom_entry_template = slurp("templates/entry.atom");
+    my $atom_template       = slurp("templates/default.atom");
+    my $atom_content = '';
+
+    for %all_posts{@all_posts_newest_first[^(10 min +%all_posts)]} -> %info {
+        my $markdown_filename = %info<url> ~ ".markdown";
+        given open "posts/$markdown_filename" -> $infile {
+
+            $infile.get;
+            1 until $infile.get eq '---';
+
+            my $temp_filename = "/tmp/justmarkdown";
+            given open $temp_filename, :w -> $tempfile {
+                $tempfile.print($infile.slurp);
+                $tempfile.close();
+            }
+
+            $infile.close();
+
+            my $converted_content
+                = qx[Markdown_1.0.1/Markdown.pl /tmp/justmarkdown];
+            unlink $temp_filename;
+
+            my $date = %info<created>.substr(0, 10);
+            my $id = ($root_url ~ '/' ~ %info<url>).&subst_all(
+                'http://'    => 'tag:',
+                '.org/'      => ".org,$date:",
+            );
+
+            my $article = $atom_entry_template.&subst_all(
+                '$id'        => $id,
+                '$root'      => $root_url,
+                '$url'       => %info<url>,
+                '$title'     => %info<title>,
+                '$author'    => %info<author>,
+                '$created'   => %info<created>,
+                '$body'      => html_escape(
+                                    apply_some_styles($converted_content)
+                                ),
+            );
+            $atom_content ~= $article;
+        }
+    }
+
+    my $atom_feed = $atom_template.&subst_all(
+        '$updated' => %all_posts{@all_posts_newest_first[0]}<created>,
+        '$body'    => $atom_content,
+    );
+    given open "_site/feed.atom", :w -> $outfile {
+        $outfile.print($atom_feed);
+        $outfile.close();
+    }
+}

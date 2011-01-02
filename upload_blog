@@ -1,0 +1,49 @@
+#! /usr/bin/env perl6
+use v6;
+
+my $SERVER = 'www48.your-server.de';
+#my %months = hash(<Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec>.kv).invert;
+
+#given "/tmp/ftp-checkdates".&open(:w) {
+#    .say("cd public_html/blog");
+#    .say("ls");
+#    .close;
+#}
+
+#my %needs_update;
+#for qqx[ftp -v $SERVER < /tmp/ftp-checkdates].split(/\n/) {
+#    my @fields = .comb(/\S+/);
+#    next unless @fields == 9;
+#
+#    my $year = 2010;
+#    my $month = %months{@fields[5]} + 1;
+#    my $day = @fields[6];
+#
+#    @fields[7] ~~ /^ (\d\d) \: (\d\d) $/
+#        or die "Unknown information in time field";
+#    my ($hour, $minute, $second) = $0, $1, 59;
+#    my $timezone = 60 * 60;
+#
+#    my $filename = ~@fields[8];
+#    next if $filename ~~ /^\./;
+#    next unless "_site/$filename".IO.e;
+#    next if DateTime.new(:$year, :$month, :$day,
+#                         :$hour, :$minute, :$second, :$timezone).Instant
+#            > "_site/$filename".IO.changed; say $filename
+#
+#    ++%needs_update{$filename};
+#}
+
+given "/tmp/ftp-instructions".&open(:w) {
+    .say("cd public_html/blog");
+
+    for dir("_site") -> $filename {
+#        if %needs_update{$filename} {
+            .say("pu $filename");
+#        }
+    }
+
+    .close;
+}
+
+run qq[[ cd _site; ftp -v $SERVER < /tmp/ftp-instructions | grep '^150 ' ]];
