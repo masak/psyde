@@ -1,0 +1,14 @@
+Herein are contained the scripts that I use nowadays to publish my blog.
+I want to evolve them towards a tool that people can download and use, not
+just for blogs, but for any static webpage. My goal is to make it a port
+of Haskell's Hakyll.
+
+Right now, things are in a bit of a jumble in this repository. They are
+fairly tied to my particular blog, because so far I've been focusing on
+getting something working rather than making things orthogonal from the
+beginning.
+
+My immediate plans include adding a comment system to the blog. After that,
+I'll start teasing the specifics and the generalistics apart.
+
+-- masak
