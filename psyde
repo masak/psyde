@@ -45,6 +45,8 @@ sub nonexistent-or-older($target, :than(@sources)!) {
            || $target.IO.changed before any(@sources).IO.changed;
 }
 
+mkdir "_site";
+
 say "[_site/list-of-posts.html]";
 for dir('posts', :test( / '.markdown' $ / )) -> $markdown_filename {
     given open "posts/$markdown_filename" -> $infile {
