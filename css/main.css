@@ -123,6 +123,10 @@ pre {
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
 
+dt {
+  font-weight: bold;
+}
+
 .index h1 {
     text-align: center;
 }
