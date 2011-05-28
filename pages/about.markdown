@@ -1,6 +1,6 @@
----
-title: About things
----
+----
+-title: About things
+----
 ## About "Strangely consistent"
 
 I needed a space where I could blog about Perl 6. This is it.
@@ -13,6 +13,11 @@ parts of the design to exhibit patterns or interact in some way. It originated
 somewhere in the vicinity of Patrick Michaud during YAPC::EU 2009.
 
 This blog is meant to last for at least ten years.
+
+## About licensing
+
+All the material on this blog is published under a
+[creative commons Attribution-Sharealike license](http://creativecommons.org/licenses/by-sa/3.0/).
 
 ## About `masak`
 
