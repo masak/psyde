@@ -5,8 +5,9 @@
 
 I needed a space where I could blog about Perl 6. This is it.
 
-The blog is a bunch of statically generated HTML pages. As it happens, the
-program that generates these pages is written in Perl 6.
+The blog is a bunch of statically generated HTML pages. As it happens, [the
+program that generates](https://github.com/masak/psyde) these pages is
+written in Perl 6.
 
 The phrase "strangely consistent" refers to the tendency of even unrelated
 parts of the design to exhibit patterns or interact in some way. It originated
@@ -47,7 +48,7 @@ puts me in the 80th percentile.
 
 I like Perl 6. I program Perl 6. For a couple of years now, Perl 6 has been
 my primary language of choice. It's not a smooth, clean experience to be
-programming Perl 6 in 2010, but if you squint, you can see a really nice
+programming Perl 6 in 2011, but if you squint, you can see a really nice
 language peeking out under the slowness and the bugs. That keeps me going.
 
 The more I learn about Perl 5, the more impressed I am by it. Perl 5 has a
