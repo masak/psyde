@@ -59,7 +59,12 @@ for dir('posts', :test( / '.markdown' $ / )) -> $markdown_filename {
             %info{$key} = $value;
         }
         %info<created> ~~ /(\d\d\d\d) '-' (\d\d) '-' (\d\d)/;
-        %info<humandate> = "$2.Int() @monthnames[$1-1], $0";
+        given Date.new("$0-$1-$2") {
+            die "Won't publish $markdown_filename which claims it was created $_"
+                when * after Date.today;
+            %info<humandate>
+                = sprintf "%d %s, %d", .day, @monthnames[.month-1], .year;
+        }
         %info<url> = "$markdown_filename.subst(/'.' <-[.]>+ $/, '')";
         %all_posts{%info<created>} = {
             filename =>"posts/$markdown_filename",
