@@ -45,7 +45,8 @@ sub nonexistent-or-older($target, :than(@sources)!) {
            || $target.IO.changed before any(@sources).IO.changed;
 }
 
-mkdir "_site";
+try mkdir "_site";
+die $! if $! and $! !~~ /'File exists'/;
 
 say "[_site/list-of-posts.html]";
 for dir('posts', :test( / '.markdown' $ / )) -> $markdown_filename {

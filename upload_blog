@@ -46,4 +46,4 @@ given "/tmp/ftp-instructions".&open(:w) {
     .close;
 }
 
-run qq[[ cd _site; ftp -p -v $SERVER < /tmp/ftp-instructions | grep '^150 ' ]];
+shell qq[[ cd _site; ftp -p -v $SERVER < /tmp/ftp-instructions | grep '^150 ' ]];
