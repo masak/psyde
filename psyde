@@ -49,7 +49,7 @@ try mkdir "_site";
 die $! if $! and $! !~~ /'File exists'/;
 
 say "[_site/list-of-posts.html]";
-for dir('posts', :test( / '.markdown' $ / )) -> $markdown_filename {
+for dir('posts', :test( / '.markdown' $ / ))>>.basename -> $markdown_filename {
     given open "posts/$markdown_filename" -> $infile {
 
         $infile.get;

@@ -37,7 +37,7 @@ my $SERVER = 'www48.your-server.de';
 given "/tmp/ftp-instructions".&open(:w) {
     .say("cd public_html/blog");
 
-    for dir("_site") -> $filename {
+    for dir("_site")>>.basename -> $filename {
 #        if %needs_update{$filename} {
             .say("pu $filename");
 #        }
