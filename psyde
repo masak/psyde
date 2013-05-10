@@ -19,16 +19,14 @@ sub subst_all(Str $string is copy, *@substitutions) {
 }
 
 sub html_escape {
-    # RAKUDO: Need this unnecessary prefix:<~> to make it work
-    return (~$^original).trans:
+    return $^original.trans:
            ['&',     '<',    '>'   ]
         => ['&amp;', '&lt;', '&gt;']
     ;
 }
 
 sub apply_some_styles {
-    # RAKUDO: Need this unnecessary prefix:<~> to make it work
-    return (~$^original).trans:
+    return $^original.trans:
            ['class="quote"',
             "class='quote'",
             'class="separator"',
