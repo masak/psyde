@@ -80,7 +80,7 @@ for dir('posts', :test( / '.markdown' $ / ))>>.basename -> $markdown_filename {
 
         my $temp_filename = "/tmp/justmarkdown";
         given open $temp_filename, :w -> $tempfile {
-            $tempfile.print($infile.slurp);
+            $tempfile.print($infile.slurp-rest);
             $tempfile.close();
         }
 
@@ -158,7 +158,7 @@ if nonexistent-or-older "_site/index.html",
 
             my $temp_filename = "/tmp/justmarkdown";
             given open $temp_filename, :w -> $tempfile {
-                $tempfile.print($infile.slurp);
+                $tempfile.print($infile.slurp-rest);
                 $tempfile.close();
             }
 
@@ -212,7 +212,7 @@ if nonexistent-or-older "_site/feed.atom",
 
             my $temp_filename = "/tmp/justmarkdown";
             given open $temp_filename, :w -> $tempfile {
-                $tempfile.print($infile.slurp);
+                $tempfile.print($infile.slurp-rest);
                 $tempfile.close();
             }
 
