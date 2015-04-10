@@ -4,7 +4,7 @@ body {
   margin: 0 auto 4em;
   max-width: 50em;
   color: #211;
-  background: url('http://strangelyconsistent.org/blog/images/fading-background.png');
+  background: url('http://strangelyconsistent.org/blog/images/fading-background.png') white;
   background-repeat: repeat-x;
   background-position: center top;
   font-family: corbel, 'lucida grande', helvetica, sans-serif;
