@@ -80,10 +80,7 @@ for dir('posts', :test( / '.markdown' $ / ))>>.basename -> $markdown_filename {
         say "[posts/$markdown_filename -> _site/$html_filename]";
 
         my $temp_filename = "/tmp/justmarkdown";
-        given open $temp_filename, :w -> $tempfile {
-            $tempfile.print($infile.slurp-rest);
-            $tempfile.close();
-        }
+        spurt $temp_filename, $infile.slurp-rest;
 
         $infile.close();
 
@@ -107,10 +104,7 @@ for dir('posts', :test( / '.markdown' $ / ))>>.basename -> $markdown_filename {
             '$body'  => $article,
         );
 
-        given open "_site/$html_filename", :w -> $outfile {
-            $outfile.print($page);
-            $outfile.close();
-        }
+        spurt "_site/$html_filename", $page;
     }
 }
 
@@ -133,10 +127,7 @@ my $post_list_page = $postlist_template.&subst_all(
     '$root'  => $root_url,
     '$body'  => $post_list,
 );
-given open "_site/list-of-posts.html", :w -> $outfile {
-    $outfile.print($post_list_page);
-    $outfile.close();
-}
+spurt "_site/list-of-posts.html", $post_list_page;
 
 my @all_posts_newest_first = reverse sort { %all_posts{$_}<created> },
                                           keys %all_posts;
@@ -158,10 +149,7 @@ if nonexistent-or-older "_site/index.html",
             1 until $infile.get eq '---';
 
             my $temp_filename = "/tmp/justmarkdown";
-            given open $temp_filename, :w -> $tempfile {
-                $tempfile.print($infile.slurp-rest);
-                $tempfile.close();
-            }
+            spurt $temp_filename, $infile.slurp-rest;
 
             $infile.close();
 
@@ -187,10 +175,7 @@ if nonexistent-or-older "_site/index.html",
         '$root'  => $root_url,
         '$body'  => $index_posts_content,
     );
-    given open "_site/index.html", :w -> $outfile {
-        $outfile.print($index_page);
-        $outfile.close();
-    }
+    spurt "_site/index.html", $index_page;
 }
 
 my @feed_filenames = map { .<filename> },
@@ -248,8 +233,5 @@ if nonexistent-or-older "_site/feed.atom",
         '$updated' => %all_posts{@all_posts_newest_first[0]}<created>,
         '$body'    => $atom_content,
     );
-    given open "_site/feed.atom", :w -> $outfile {
-        $outfile.print($atom_feed);
-        $outfile.close();
-    }
+    spurt "_site/feed.atom", $atom_feed;
 }
