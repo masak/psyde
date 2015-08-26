@@ -9,6 +9,7 @@ my @monthnames = <Jan Feb Mar Apr
                   May Jun Jul Aug
                   Sep Oct Nov Dec>;
 my %all_posts;
+my $POSTS_IN_RSS = 10;
 my $POSTS_IN_INDEX = 3;
 
 sub subst_all(Str $string is copy, *@substitutions) {
@@ -141,7 +142,7 @@ my @all_posts_newest_first = reverse sort { %all_posts{$_}<created> },
                                           keys %all_posts;
 
 my @index_filenames = map { .<filename> },
-                      %all_posts{@all_posts_newest_first[^(3 min +%all_posts)]};
+                      %all_posts{@all_posts_newest_first[^($POSTS_IN_INDEX min +%all_posts)]};
 if nonexistent-or-older "_site/index.html",
                         :than(@index_filenames) {
 
@@ -193,7 +194,7 @@ if nonexistent-or-older "_site/index.html",
 }
 
 my @feed_filenames = map { .<filename> },
-                     %all_posts{@all_posts_newest_first[^(10 min +%all_posts)]};
+                     %all_posts{@all_posts_newest_first[^($POSTS_IN_RSS min +%all_posts)]};
 if nonexistent-or-older "_site/feed.atom",
                         :than(@feed_filenames) {
 
@@ -203,7 +204,7 @@ if nonexistent-or-older "_site/feed.atom",
     my $atom_template       = slurp("templates/default.atom");
     my $atom_content = '';
 
-    for %all_posts{@all_posts_newest_first[^(10 min +%all_posts)]} -> %info {
+    for %all_posts{@all_posts_newest_first[^($POSTS_IN_RSS min +%all_posts)]} -> %info {
         my $markdown_filename = %info<url> ~ ".markdown";
         given open "posts/$markdown_filename" -> $infile {
 
