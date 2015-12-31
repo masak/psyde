@@ -146,7 +146,7 @@ if nonexistent-or-older "_site/index.html",
         given open "posts/$markdown_filename" -> $infile {
 
             $infile.get;
-            1 until $infile.get eq '---';
+            Nil until $infile.get eq '---';
 
             my $temp_filename = "/tmp/justmarkdown";
             spurt $temp_filename, $infile.slurp-rest;
@@ -194,7 +194,7 @@ if nonexistent-or-older "_site/feed.atom",
         given open "posts/$markdown_filename" -> $infile {
 
             $infile.get;
-            1 until $infile.get eq '---';
+            Nil until $infile.get eq '---';
 
             my $temp_filename = "/tmp/justmarkdown";
             given open $temp_filename, :w -> $tempfile {
