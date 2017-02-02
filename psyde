@@ -1,6 +1,9 @@
 #! /usr/bin/env perl6
 use v6;
 
+die "It's .markdown, not .md -- sorry!"
+    if dir('posts', :test( / '.md' $ / ));
+
 my $article_template = slurp("templates/post.html");
 my $default_template = slurp("templates/default.html");
 my $root_url = "http://strangelyconsistent.org/blog";
